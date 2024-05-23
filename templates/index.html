@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorPaletteGenerator</title>
+    <style>
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            
+        }
+        
+
+        .container{
+            background-color: black;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+        }
+
+        .color {
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: flex-end;
+            cursor: pointer;
+            transition: 0.2s opacity;
+        }
+
+        .color:active{
+            opacity: 0.8;
+        }
+
+        .color span {
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px black;
+        }
+
+        #form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+        }
+
+        #form input[type="text"]{
+            font-size: 2rem;
+            outline: 0;
+            background-color: #f2f2f2;
+            border: 2px solid white;
+            padding: 20px;
+            width: 400px;
+
+
+        }
+
+        .btn {
+            background-color: green;
+            padding: 20px;
+            font-size: 2rem;
+            color: white;
+            border: 2px solid white;
+            transition: 0.2s opacity;
+
+
+
+        }
+
+        .btn:hover{
+            opacity: 0.8;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+
+    </div>
+
+    <form id="form"> 
+        <input type="text" name="query">
+        <button class="btn">Submit</button>
+    </form>
+
+    <script>
+        const form = document.querySelector('#form');
+        form.addEventListener("submit",function(e) {
+            e.preventDefault();
+            const query =form.elements.query.value;
+            fetch("/palette", {
+                method: "POST",
+                headers : {
+                    "Content-type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    query: query
+                })
+            }
+            )
+            .then(res => res.json())
+            .then(data => {
+                const colors =data.colors;
+                const container = document.querySelector(".container");
+                container.innerHTML = "";
+                for(const color of colors){
+                    const div = document.createElement("div");
+                    div.style.backgroundColor = color;
+                    div.style.width = `calc(100% / ${colors.length})`
+                    
+
+                    div.addEventListener("click", function(){
+                        navigator.clipboard.writeText(color);
+                    })
+                    const span = document.createElement("span");
+                    span.innerText = color;
+                    div.appendChild(span);
+
+
+                    container.appendChild(div)
+
+                }
+            })
+
+        })
+
+    </script>
+</body>
+</html>
